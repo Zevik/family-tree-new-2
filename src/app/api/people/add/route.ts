@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
             );
             
             // עדכון ילדים משותפים אם נבחרו
-            if (relatedPerson && typeof relatedPerson === 'object' && !('spouseId' in relatedPerson || !relatedPerson.spouseId)) { // אם זה בן/בת זוג ראשון
+            if (relatedPerson && typeof relatedPerson === 'object' && !('spouseId' in relatedPerson)) { // אם זה בן/בת זוג ראשון
               const children = await PersonModel.find({ 
                 $or: [
                   { fatherId: data.relatedPersonId },
