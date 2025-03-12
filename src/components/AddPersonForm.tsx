@@ -302,21 +302,6 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
             />
           </div>
         </div>
-
-        <div className="flex items-center mt-2">
-          <input
-            type="checkbox"
-            id="notifyOnBirthday"
-            name="notifyOnBirthday"
-            checked={formData.notifyOnBirthday}
-            onChange={handleCheckboxChange}
-            className="h-4 w-4 mr-2"
-          />
-          <label htmlFor="notifyOnBirthday" className="text-sm flex items-center">
-            {formData.notifyOnBirthday ? <FaBell className="text-primary-500 mr-1" /> : <FaBellSlash className="text-gray-400 mr-1" />}
-            קבל התראה ליום הולדת
-          </label>
-        </div>
       </div>
 
       {/* תאריך פטירה */}
