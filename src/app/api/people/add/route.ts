@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
             let isRelatedPersonMale = true; // Default assumption
             
             // If the related person has a spouse, check if they are a father or mother to other children
-            if (relatedPerson.spouseId) {
+            if ('spouseId' in relatedPerson && relatedPerson.spouseId) {
               const childrenWithRelatedAsFather = await PersonModel.findOne({ 
                 fatherId: data.relatedPersonId 
               }).lean();
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
               );
               
               // If the father has a spouse and the user selected to share the other parent
-              if (relatedPerson.spouseId && selectedRelationships.shareOtherParent) {
+              if ('spouseId' in relatedPerson && relatedPerson.spouseId && selectedRelationships.shareOtherParent) {
                 await PersonModel.updateOne(
                   { id: newId },
                   { motherId: relatedPerson.spouseId }
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
               );
               
               // If the mother has a spouse and the user selected to share the other parent
-              if (relatedPerson.spouseId && selectedRelationships.shareOtherParent) {
+              if ('spouseId' in relatedPerson && relatedPerson.spouseId && selectedRelationships.shareOtherParent) {
                 await PersonModel.updateOne(
                   { id: newId },
                   { fatherId: relatedPerson.spouseId }
