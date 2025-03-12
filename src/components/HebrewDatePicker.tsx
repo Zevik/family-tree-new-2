@@ -95,7 +95,6 @@ export default function HebrewDatePicker({
         onCalendarOpen={() => console.log('Calendar opened')}
         onClickOutside={() => console.log('Clicked outside')}
         onSelect={(date) => console.log('Date selected:', date)}
-        onClear={handleClear}
       />
       <div className="mt-2 text-sm text-gray-600 text-right">
         {hebrewDateText ? (
