@@ -417,8 +417,8 @@ function numberToHebrewLetters(num: number): string {
   
   // מספרים מיוחדים עם גרשיים
   const specialNumbers = {
-    15: 'ט״ו',
-    16: 'ט״ז'
+    15: 'ט"ו',
+    16: 'ט"ז'
   };
   
   if (specialNumbers[num]) {
@@ -450,11 +450,11 @@ function numberToHebrewLetters(num: number): string {
     result += letters[ones];
   }
   
-  // הוספת גרשיים
+  // הוספת גרשיים בפורמט הנכון
   if (result.length === 1) {
-    result += '׳';
+    result += "'";
   } else if (result.length > 1) {
-    result += '״';
+    result += '"';
   }
   
   return result;
