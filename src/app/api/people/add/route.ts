@@ -165,14 +165,16 @@ export async function POST(request: NextRequest) {
             
           case 'sibling':
             // Copy the parent IDs from the sibling based on selection
-            if (relatedPerson.fatherId && selectedRelationships.shareFather) {
+            if (relatedPerson && !Array.isArray(relatedPerson) && 'fatherId' in relatedPerson && 
+                relatedPerson.fatherId && selectedRelationships.shareFather) {
               await PersonModel.updateOne(
                 { id: newId },
                 { fatherId: relatedPerson.fatherId }
               );
             }
             
-            if (relatedPerson.motherId && selectedRelationships.shareMother) {
+            if (relatedPerson && !Array.isArray(relatedPerson) && 'motherId' in relatedPerson && 
+                relatedPerson.motherId && selectedRelationships.shareMother) {
               await PersonModel.updateOne(
                 { id: newId },
                 { motherId: relatedPerson.motherId }
@@ -189,7 +191,8 @@ export async function POST(request: NextRequest) {
               );
               
               // Update siblings if selected
-              if (relatedPerson.motherId) {
+              if (relatedPerson && typeof relatedPerson === 'object' && !Array.isArray(relatedPerson) && 
+                  'motherId' in relatedPerson && relatedPerson.motherId) {
                 const siblings = await PersonModel.find({ 
                   motherId: relatedPerson.motherId,
                   id: { $ne: data.relatedPersonId }
@@ -213,7 +216,8 @@ export async function POST(request: NextRequest) {
               );
               
               // Update siblings if selected
-              if (relatedPerson.fatherId) {
+              if (relatedPerson && typeof relatedPerson === 'object' && !Array.isArray(relatedPerson) && 
+                  'fatherId' in relatedPerson && relatedPerson.fatherId) {
                 const siblings = await PersonModel.find({ 
                   fatherId: relatedPerson.fatherId,
                   id: { $ne: data.relatedPersonId }
