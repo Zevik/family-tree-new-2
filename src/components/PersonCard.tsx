@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { PersonWithRelations } from '@/models/Person';
-import { FaPlus, FaUser, FaUsers, FaHeart, FaChild, FaChevronDown, FaChevronUp, FaPhone, FaEnvelope, FaBell } from 'react-icons/fa';
+import { FaPlus, FaUser, FaUsers, FaHeart, FaChild, FaChevronDown, FaChevronUp, FaPhone, FaEnvelope, FaBell, FaStar } from 'react-icons/fa';
 import AddPersonForm from './AddPersonForm';
+import { formatHebrewDate } from '@/utils/familyUtils';
 
 interface PersonCardProps {
   person: PersonWithRelations;
@@ -38,21 +39,21 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
     if (primaryFormat === 'hebrew' && hebrewDate) {
       return (
         <span>
-          {hebrewDate}
+          {formatHebrewDate(hebrewDate)}
           {gregorianDate && <span className="text-xs text-gray-500 mr-2">({gregorianDate})</span>}
         </span>
       );
     } else if (primaryFormat === 'both' && gregorianDate && hebrewDate) {
       return (
         <span>
-          {gregorianDate} / {hebrewDate}
+          {gregorianDate} / {formatHebrewDate(hebrewDate)}
         </span>
       );
     } else {
       return (
         <span>
           {gregorianDate}
-          {hebrewDate && <span className="text-xs text-gray-500 mr-2">({hebrewDate})</span>}
+          {hebrewDate && <span className="text-xs text-gray-500 mr-2">({formatHebrewDate(hebrewDate)})</span>}
         </span>
       );
     }
@@ -63,9 +64,15 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
     return (
       <div 
         id={`person-card-${person.id}`}
-        className={`person-card w-full border rounded-lg p-4 ${isSelected ? 'border-primary-500 bg-primary-50' : 'border-gray-200'} hover:border-primary-300 transition-colors`}
+        className={`person-card w-full border rounded-lg p-4 ${isSelected ? 'border-primary-500 bg-primary-50' : 'border-gray-200'} hover:border-primary-300 transition-colors relative`}
         onClick={() => onSelect(person.id)}
       >
+        {person.notifyOnBirthday && (
+          <div className="absolute top-2 left-2 text-yellow-500">
+            <FaStar />
+          </div>
+        )}
+        
         <div className="flex justify-between items-center">
           <div className="flex-1">
             <h3 className="text-lg font-bold">{person.firstName} {person.lastName}</h3>
@@ -274,9 +281,15 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
   return (
     <div 
       id={`person-card-${person.id}`}
-      className={`person-card card ${isSelected ? 'card-highlighted' : ''}`}
+      className={`person-card card ${isSelected ? 'card-highlighted' : ''} relative`}
       onClick={() => onSelect(person.id)}
     >
+      {person.notifyOnBirthday && (
+        <div className="absolute top-2 left-2 text-yellow-500">
+          <FaStar />
+        </div>
+      )}
+      
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-xl font-bold">{person.firstName} {person.lastName}</h3>
         <button 

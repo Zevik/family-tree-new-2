@@ -378,6 +378,88 @@ export async function getCurrentHebrewDate(): Promise<{
   }
 }
 
+// פונקציה להמרת תאריך עברי לפורמט מסורתי
+export function formatHebrewDate(hebrewDateString: string): string {
+  if (!hebrewDateString) return '';
+  
+  try {
+    // פירוק התאריך העברי (בפורמט "יום חודש שנה")
+    const parts = hebrewDateString.split(' ');
+    if (parts.length < 3) {
+      console.log(`Invalid Hebrew date format: ${hebrewDateString}, returning original string`);
+      return hebrewDateString;
+    }
+    
+    const day = parseInt(parts[0], 10);
+    const month = parts[1];
+    const year = parseInt(parts[2], 10);
+    
+    // המרת המספר לאותיות עבריות עם גרשיים
+    const hebrewDay = numberToHebrewLetters(day);
+    const hebrewYear = numberToHebrewLetters(year % 1000); // לוקחים רק את 3 הספרות האחרונות
+    
+    return `${hebrewDay} ב${month} ${hebrewYear}`;
+  } catch (error) {
+    console.error(`Error formatting Hebrew date ${hebrewDateString}:`, error);
+    return hebrewDateString;
+  }
+}
+
+// פונקציה להמרת מספר לאותיות עבריות
+function numberToHebrewLetters(num: number): string {
+  const letters = {
+    1: 'א', 2: 'ב', 3: 'ג', 4: 'ד', 5: 'ה',
+    6: 'ו', 7: 'ז', 8: 'ח', 9: 'ט', 10: 'י',
+    20: 'כ', 30: 'ל', 40: 'מ', 50: 'נ', 60: 'ס',
+    70: 'ע', 80: 'פ', 90: 'צ', 100: 'ק', 200: 'ר',
+    300: 'ש', 400: 'ת'
+  };
+  
+  // מספרים מיוחדים עם גרשיים
+  const specialNumbers = {
+    15: 'ט״ו',
+    16: 'ט״ז'
+  };
+  
+  if (specialNumbers[num]) {
+    return specialNumbers[num];
+  }
+  
+  if (num === 0) return '';
+  
+  let result = '';
+  
+  // מאות
+  const hundreds = Math.floor(num / 100) * 100;
+  if (hundreds > 0) {
+    result += letters[Math.min(hundreds, 400)];
+    if (hundreds > 400) {
+      result += letters[hundreds - 400];
+    }
+  }
+  
+  // עשרות
+  const tens = Math.floor((num % 100) / 10) * 10;
+  if (tens > 0) {
+    result += letters[tens];
+  }
+  
+  // יחידות
+  const ones = num % 10;
+  if (ones > 0) {
+    result += letters[ones];
+  }
+  
+  // הוספת גרשיים
+  if (result.length === 1) {
+    result += '׳';
+  } else if (result.length > 1) {
+    result += '״';
+  }
+  
+  return result;
+}
+
 // פונקציה לחישוב מספר הימים עד התאריך העברי הבא
 function calculateDaysUntilHebrewDate(hebrewDateString: string, currentHebrewDate: any): number {
   try {
@@ -388,18 +470,19 @@ function calculateDaysUntilHebrewDate(hebrewDateString: string, currentHebrewDat
     
     console.log(`Calculating days until Hebrew date: ${hebrewDateString}`);
     
-    // פירוק התאריך העברי (בפורמט "יום חודש")
+    // פירוק התאריך העברי (בפורמט "יום חודש שנה")
     const parts = hebrewDateString.split(' ');
-    if (parts.length < 2) {
+    if (parts.length < 3) {
       console.log(`Invalid Hebrew date format: ${hebrewDateString}, returning default value`);
       return 30; // ערך ברירת מחדל
     }
     
     const targetDay = parseInt(parts[0], 10);
     const targetMonth = parts[1];
+    const targetYear = parseInt(parts[2], 10);
     
-    if (isNaN(targetDay)) {
-      console.log(`Invalid Hebrew day in date: ${hebrewDateString}, returning default value`);
+    if (isNaN(targetDay) || isNaN(targetMonth) || isNaN(targetYear)) {
+      console.log(`Invalid Hebrew date format: ${hebrewDateString}, returning default value`);
       return 30; // ערך ברירת מחדל
     }
     
