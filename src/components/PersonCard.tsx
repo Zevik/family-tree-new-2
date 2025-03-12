@@ -5,6 +5,7 @@ import { PersonWithRelations } from '@/models/Person';
 import { FaPlus, FaUser, FaUsers, FaHeart, FaChild, FaChevronDown, FaChevronUp, FaPhone, FaEnvelope, FaBell, FaStar } from 'react-icons/fa';
 import AddPersonForm from './AddPersonForm';
 import { formatHebrewDate } from '@/utils/familyUtils';
+import useFamilyData from '@/hooks/useFamilyData';
 
 interface PersonCardProps {
   person: PersonWithRelations;
@@ -16,6 +17,7 @@ interface PersonCardProps {
 export default function PersonCard({ person, isSelected, onSelect, viewMode }: PersonCardProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const { mutate } = useFamilyData();
 
   const handleAddClick = () => {
     setShowAddForm(true);
@@ -28,6 +30,32 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
   const toggleExpanded = (e: React.MouseEvent) => {
     e.stopPropagation();
     setExpanded(!expanded);
+  };
+
+  // פונקציה לעדכון מצב ההתראה ליום הולדת
+  const toggleNotification = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      const response = await fetch(`/api/people/${person.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          notifyOnBirthday: !person.notifyOnBirthday
+        }),
+      });
+
+      if (response.ok) {
+        // רענון הנתונים
+        mutate();
+      } else {
+        console.error('Failed to update notification status');
+      }
+    } catch (error) {
+      console.error('Error updating notification status:', error);
+    }
   };
 
   // פונקציה להצגת תאריך לפי הפורמט הראשי
@@ -67,12 +95,6 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
         className={`person-card w-full border rounded-lg p-4 ${isSelected ? 'border-primary-500 bg-primary-50' : 'border-gray-200'} hover:border-primary-300 transition-colors relative`}
         onClick={() => onSelect(person.id)}
       >
-        {person.notifyOnBirthday && (
-          <div className="absolute top-2 left-2 text-yellow-500">
-            <FaStar />
-          </div>
-        )}
-        
         <div className="flex justify-between items-center">
           <div className="flex-1">
             <h3 className="text-lg font-bold">{person.firstName} {person.lastName}</h3>
@@ -267,6 +289,16 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
           </div>
         )}
         
+        <div className="absolute bottom-2 left-2">
+          <button 
+            className={`text-xl ${person.notifyOnBirthday ? 'text-yellow-500' : 'text-gray-300'}`}
+            onClick={toggleNotification}
+            aria-label={person.notifyOnBirthday ? 'בטל התראה ליום הולדת' : 'הפעל התראה ליום הולדת'}
+          >
+            <FaStar />
+          </button>
+        </div>
+        
         {showAddForm && (
           <AddPersonForm 
             relatedPersonId={person.id}
@@ -284,12 +316,6 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
       className={`person-card card ${isSelected ? 'card-highlighted' : ''} relative`}
       onClick={() => onSelect(person.id)}
     >
-      {person.notifyOnBirthday && (
-        <div className="absolute top-2 left-2 text-yellow-500">
-          <FaStar />
-        </div>
-      )}
-      
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-xl font-bold">{person.firstName} {person.lastName}</h3>
         <button 
@@ -466,6 +492,16 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
             </p>
           )}
         </div>
+      </div>
+
+      <div className="absolute bottom-2 left-2">
+        <button 
+          className={`text-xl ${person.notifyOnBirthday ? 'text-yellow-500' : 'text-gray-300'}`}
+          onClick={toggleNotification}
+          aria-label={person.notifyOnBirthday ? 'בטל התראה ליום הולדת' : 'הפעל התראה ליום הולדת'}
+        >
+          <FaStar />
+        </button>
       </div>
 
       {showAddForm && (

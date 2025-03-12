@@ -298,7 +298,7 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
               onChange={(value) => setFormData(prev => ({ ...prev, birthDateHebrew: value }))}
               className="w-full"
               isHebrew={true}
-              label="תאריך לידה (עברי)"
+              label=""
             />
           </div>
         </div>
@@ -314,7 +314,7 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
           />
           <label htmlFor="notifyOnBirthday" className="text-sm flex items-center">
             {formData.notifyOnBirthday ? <FaBell className="text-primary-500 mr-1" /> : <FaBellSlash className="text-gray-400 mr-1" />}
-            קבל התראה ליום הולדת של אדם זה ({formData.primaryDateFormat === 'hebrew' ? 'לפי תאריך עברי' : 'לפי תאריך לועזי'})
+            קבל התראה ליום הולדת ({formData.primaryDateFormat === 'hebrew' ? 'לפי תאריך עברי' : 'לפי תאריך לועזי'})
           </label>
         </div>
       </div>
@@ -358,7 +358,7 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
               onChange={(value) => setFormData(prev => ({ ...prev, deathDateHebrew: value }))}
               className="w-full"
               isHebrew={true}
-              label="תאריך פטירה (עברי)"
+              label=""
             />
           </div>
         </div>
@@ -410,7 +410,7 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
                 onChange={(value) => setFormData(prev => ({ ...prev, marriageDateHebrew: value }))}
                 className="w-full"
                 isHebrew={true}
-                label="תאריך נישואין (עברי)"
+                label=""
               />
             </div>
           </div>
