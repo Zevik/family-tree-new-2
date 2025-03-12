@@ -314,7 +314,7 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
           />
           <label htmlFor="notifyOnBirthday" className="text-sm flex items-center">
             {formData.notifyOnBirthday ? <FaBell className="text-primary-500 mr-1" /> : <FaBellSlash className="text-gray-400 mr-1" />}
-            קבל התראה ליום הולדת ({formData.primaryDateFormat === 'hebrew' ? 'לפי תאריך עברי' : 'לפי תאריך לועזי'})
+            קבל התראה ליום הולדת
           </label>
         </div>
       </div>
