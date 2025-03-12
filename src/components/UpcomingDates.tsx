@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PersonWithRelations } from '@/models/Person';
-import { getUpcomingDates } from '@/utils/familyUtils';
+import { getUpcomingDates, getCurrentHebrewDate } from '@/utils/familyUtils';
 import { FaBirthdayCake, FaHeart, FaCalendarAlt, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
 interface UpcomingDatesProps {
@@ -14,6 +14,13 @@ export default function UpcomingDates({ people, onPersonSelect }: UpcomingDatesP
   console.log('UpcomingDates component rendering, people:', people ? people.length : 0);
   
   const [isExpanded, setIsExpanded] = useState(false);
+  const [currentDate, setCurrentDate] = useState<{ 
+    gregorian: string,
+    hebrew: string | null
+  }>({ 
+    gregorian: '',
+    hebrew: null
+  });
   
   let birthdays: any[] = [];
   let anniversaries: any[] = [];
@@ -33,8 +40,6 @@ export default function UpcomingDates({ people, onPersonSelect }: UpcomingDatesP
     anniversaries = [];
   }
   
-  const [currentDate, setCurrentDate] = useState<{ gregorian: string }>({ gregorian: '' });
-  
   useEffect(() => {
     // קבלת התאריך הנוכחי
     try {
@@ -44,8 +49,34 @@ export default function UpcomingDates({ people, onPersonSelect }: UpcomingDatesP
       const year = today.getFullYear();
       
       const gregorianDate = `${day}/${month}/${year}`;
-      console.log('Setting current date:', gregorianDate);
-      setCurrentDate({ gregorian: gregorianDate });
+      console.log('Setting current Gregorian date:', gregorianDate);
+      
+      // קבלת התאריך העברי הנוכחי
+      const fetchHebrewDate = async () => {
+        try {
+          const hebrewDate = await getCurrentHebrewDate();
+          if (hebrewDate) {
+            console.log('Current Hebrew date:', hebrewDate);
+            setCurrentDate({ 
+              gregorian: gregorianDate,
+              hebrew: hebrewDate.hebrew
+            });
+          } else {
+            setCurrentDate({ 
+              gregorian: gregorianDate,
+              hebrew: null
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching Hebrew date:', error);
+          setCurrentDate({ 
+            gregorian: gregorianDate,
+            hebrew: null
+          });
+        }
+      };
+      
+      fetchHebrewDate();
     } catch (error) {
       console.error('Error setting current date:', error);
     }
@@ -69,8 +100,11 @@ export default function UpcomingDates({ people, onPersonSelect }: UpcomingDatesP
         </h2>
         
         <div className="flex items-center">
-          <div className="text-sm text-gray-500 ml-4">
-            <span>{currentDate.gregorian}</span>
+          <div className="text-sm text-gray-500 ml-4 text-left">
+            {currentDate.hebrew && (
+              <div className="font-bold">{currentDate.hebrew}</div>
+            )}
+            <div>{currentDate.gregorian}</div>
           </div>
           <button className="text-gray-500">
             {isExpanded ? (
