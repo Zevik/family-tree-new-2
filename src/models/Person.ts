@@ -16,7 +16,6 @@ export interface Person {
   hidden?: boolean;
   primaryDateFormat?: 'hebrew' | 'gregorian' | 'both';
   notifyOnBirthday?: boolean;
-  notifyOnMarriageAnniversary?: boolean;
 }
 
 export interface PersonWithRelations extends Person {

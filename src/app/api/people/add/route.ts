@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
       phone: data.phone,
       primaryDateFormat: data.primaryDateFormat || 'gregorian',
       notifyOnBirthday: data.notifyOnBirthday || false,
-      notifyOnMarriageAnniversary: data.notifyOnMarriageAnniversary || false,
     };
     
     // Save the new person
@@ -67,7 +66,6 @@ export async function POST(request: NextRequest) {
                 spouseId: newId, 
                 marriageDate: data.marriageDate,
                 marriageDateHebrew: data.marriageDateHebrew,
-                notifyOnMarriageAnniversary: data.notifyOnMarriageAnniversary || false
               }
             );
             

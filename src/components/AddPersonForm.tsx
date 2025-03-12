@@ -34,7 +34,6 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
     parentType: 'father' as ParentType['value'],
     primaryDateFormat: 'gregorian' as 'hebrew' | 'gregorian',
     notifyOnBirthday: false,
-    notifyOnMarriageAnniversary: false,
   });
 
   // מידע על קשרים נבחרים
@@ -315,7 +314,7 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
           />
           <label htmlFor="notifyOnBirthday" className="text-sm flex items-center">
             {formData.notifyOnBirthday ? <FaBell className="text-primary-500 mr-1" /> : <FaBellSlash className="text-gray-400 mr-1" />}
-            קבל התראה ליום הולדת ({formData.primaryDateFormat === 'hebrew' ? 'לפי תאריך עברי' : 'לפי תאריך לועזי'})
+            קבל התראה ליום הולדת של אדם זה ({formData.primaryDateFormat === 'hebrew' ? 'לפי תאריך עברי' : 'לפי תאריך לועזי'})
           </label>
         </div>
       </div>
@@ -414,21 +413,6 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
                 label="תאריך נישואין (עברי)"
               />
             </div>
-          </div>
-
-          <div className="flex items-center mt-2">
-            <input
-              type="checkbox"
-              id="notifyOnMarriageAnniversary"
-              name="notifyOnMarriageAnniversary"
-              checked={formData.notifyOnMarriageAnniversary}
-              onChange={handleCheckboxChange}
-              className="h-4 w-4 mr-2"
-            />
-            <label htmlFor="notifyOnMarriageAnniversary" className="text-sm flex items-center">
-              {formData.notifyOnMarriageAnniversary ? <FaBell className="text-primary-500 mr-1" /> : <FaBellSlash className="text-gray-400 mr-1" />}
-              קבל התראה ליום נישואין ({formData.primaryDateFormat === 'hebrew' ? 'לפי תאריך עברי' : 'לפי תאריך לועזי'})
-            </label>
           </div>
         </div>
       )}

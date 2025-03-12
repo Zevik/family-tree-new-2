@@ -20,7 +20,6 @@ const PersonSchema = new Schema<Person>(
     hidden: { type: Boolean, default: false },
     primaryDateFormat: { type: String, enum: ['hebrew', 'gregorian', 'both'], default: 'gregorian' },
     notifyOnBirthday: { type: Boolean, default: false },
-    notifyOnMarriageAnniversary: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

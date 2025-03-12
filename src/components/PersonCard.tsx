@@ -73,7 +73,6 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
               {(person.birthDateGregorian || person.birthDateHebrew) && (
                 <span>
                   {renderDate(person.birthDateGregorian, person.birthDateHebrew)}
-                  {person.notifyOnBirthday && <FaBell className="text-primary-500 inline-block mr-1" />}
                 </span>
               )}
               {person.phone && (
@@ -172,7 +171,6 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
                       <p className="text-sm">
                         <span className="font-semibold">תאריך נישואין: </span>
                         {renderDate(person.spouse.marriageDate, person.spouse.marriageDateHebrew)}
-                        {person.notifyOnMarriageAnniversary && <FaBell className="text-primary-500 inline-block mr-1" />}
                       </p>
                     )}
                   </div>
@@ -300,7 +298,6 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
             <p className="text-sm">
               <span className="font-semibold">תאריך לידה: </span>
               {renderDate(person.birthDateGregorian, person.birthDateHebrew)}
-              {person.notifyOnBirthday && <FaBell className="text-primary-500 inline-block mr-1" />}
             </p>
           )}
           
@@ -374,7 +371,6 @@ export default function PersonCard({ person, isSelected, onSelect, viewMode }: P
                 <p className="text-sm">
                   <span className="font-semibold">תאריך נישואין: </span>
                   {renderDate(person.spouse.marriageDate, person.spouse.marriageDateHebrew)}
-                  {person.notifyOnMarriageAnniversary && <FaBell className="text-primary-500 inline-block mr-1" />}
                 </p>
               )}
             </div>
