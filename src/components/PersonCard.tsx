@@ -5,7 +5,7 @@ import { PersonWithRelations } from '@/models/Person';
 import { FaPlus, FaUser, FaUsers, FaHeart, FaChild, FaChevronDown, FaChevronUp, FaPhone, FaEnvelope, FaBell, FaStar } from 'react-icons/fa';
 import AddPersonForm from './AddPersonForm';
 import { formatHebrewDate } from '@/utils/familyUtils';
-import useFamilyData from '@/hooks/useFamilyData';
+import { useFamilyData } from '@/lib/hooks/useFamilyData';
 
 interface PersonCardProps {
   person: PersonWithRelations;
