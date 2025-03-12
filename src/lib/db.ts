@@ -1,5 +1,11 @@
 import mongoose from 'mongoose';
 
+// הוספת הגדרת טיפוס ל-global
+declare global {
+  // eslint-disable-next-line no-var
+  var mongoose: any;
+}
+
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {

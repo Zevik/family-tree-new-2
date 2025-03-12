@@ -9,17 +9,18 @@ enum JewishMonth {
   Nisan = 'Nisan',
   Iyyar = 'Iyyar',
   Sivan = 'Sivan',
-  Tamuz = 'Tamuz',
+  Tammuz = 'Tammuz',
   Av = 'Av',
   Elul = 'Elul',
-  Tishrei = 'Tishrei',
+  Tishri = 'Tishri',
   Cheshvan = 'Cheshvan',
   Kislev = 'Kislev',
   Tevet = 'Tevet',
   Shevat = 'Shevat',
   Adar = 'Adar',
-  Adar1 = 'Adar1',
-  Adar2 = 'Adar2'
+  AdarI = 'AdarI',
+  AdarII = 'AdarII',
+  None = 'None'
 }
 
 interface ImprovedHebrewDatePickerProps {
@@ -39,6 +40,7 @@ export default function ImprovedHebrewDatePicker({
 }: ImprovedHebrewDatePickerProps) {
   const [selectedDay, setSelectedDay] = useState<BasicJewishDay | undefined>();
   const [initialDate, setInitialDate] = useState<BasicJewishDate | undefined>();
+  const [hebrewDateText, setHebrewDateText] = useState<string>('');
   
   console.log('ImprovedHebrewDatePicker rendering with value:', value);
 
@@ -59,7 +61,7 @@ export default function ImprovedHebrewDatePicker({
           if (!isNaN(day) && monthName && !isNaN(year)) {
             const initialJewishDate: BasicJewishDate = {
               day,
-              monthName,
+              monthName: monthName as any,
               year
             };
             console.log('Setting initial date:', initialJewishDate);
@@ -75,31 +77,32 @@ export default function ImprovedHebrewDatePicker({
     }
   }, [value, selectedDay]);
 
-  // טיפול בשינוי תאריך
+  // פונקציה לטיפול בשינוי תאריך
   const handleDateChange = (day: BasicJewishDay) => {
-    console.log('Date selected:', day);
-    setSelectedDay(day);
-    
     try {
-      // בדיקה שיש לנו את כל הנתונים הדרושים
-      if (!day || !day.jewishDate) {
-        console.error('Invalid day object:', day);
-        return;
-      }
+      console.log('Date changed:', day);
+      setSelectedDay(day);
       
-      // המרת התאריך לפורמט מחרוזת
+      // יצירת מחרוזת תאריך עברי
       const hebrewDateStr = isHebrew 
         ? `${day.jewishDate.day} ${getHebrewMonthName(day.jewishDate.monthName)} ${day.jewishDate.year}`
         : `${day.jewishDate.day} ${day.jewishDate.monthName} ${day.jewishDate.year}`;
-      
-      console.log('Hebrew date string:', hebrewDateStr);
+      setHebrewDateText(hebrewDateStr);
       
       // המרת התאריך הלועזי לאובייקט Date אם הוא קיים
       let gregorianDate: Date | undefined = undefined;
-      if (day.gregorianDate && typeof day.gregorianDate.year === 'number' && 
-          typeof day.gregorianDate.month === 'number' && 
-          typeof day.gregorianDate.day === 'number') {
-        gregorianDate = new Date(day.gregorianDate.year, day.gregorianDate.month - 1, day.gregorianDate.day);
+      
+      // בדיקה בטוחה של התאריך הלועזי
+      const anyDay = day as any;
+      if (anyDay && anyDay.gregorianDate && 
+          typeof anyDay.gregorianDate.year === 'number' && 
+          typeof anyDay.gregorianDate.month === 'number' && 
+          typeof anyDay.gregorianDate.day === 'number') {
+        gregorianDate = new Date(
+          anyDay.gregorianDate.year, 
+          anyDay.gregorianDate.month - 1, 
+          anyDay.gregorianDate.day
+        );
       }
       
       onChange(hebrewDateStr, gregorianDate);
@@ -114,52 +117,53 @@ export default function ImprovedHebrewDatePicker({
       [JewishMonth.Nisan]: 'ניסן',
       [JewishMonth.Iyyar]: 'אייר',
       [JewishMonth.Sivan]: 'סיון',
-      [JewishMonth.Tamuz]: 'תמוז',
+      [JewishMonth.Tammuz]: 'תמוז',
       [JewishMonth.Av]: 'אב',
       [JewishMonth.Elul]: 'אלול',
-      [JewishMonth.Tishrei]: 'תשרי',
+      [JewishMonth.Tishri]: 'תשרי',
       [JewishMonth.Cheshvan]: 'חשון',
       [JewishMonth.Kislev]: 'כסלו',
       [JewishMonth.Tevet]: 'טבת',
       [JewishMonth.Shevat]: 'שבט',
       [JewishMonth.Adar]: 'אדר',
-      [JewishMonth.Adar1]: 'אדר א׳',
-      [JewishMonth.Adar2]: 'אדר ב׳'
+      [JewishMonth.AdarI]: 'אדר א׳',
+      [JewishMonth.AdarII]: 'אדר ב׳'
     };
     
     return hebrewMonthNames[monthName] || monthName;
   };
 
-  // פונקציה להמרת שם חודש עברי בעברית לערך JewishMonth
-  const getJewishMonthFromHebrew = (hebrewName: string): string | undefined => {
-    const monthMap: Record<string, string> = {
+  // פונקציה להמרת שם חודש עברי בעברית לשם באנגלית
+  const getJewishMonthFromHebrew = (hebrewName: string): JewishMonth => {
+    const monthMap: Record<string, JewishMonth> = {
       'ניסן': JewishMonth.Nisan,
       'אייר': JewishMonth.Iyyar,
       'סיון': JewishMonth.Sivan,
-      'תמוז': JewishMonth.Tamuz,
+      'תמוז': JewishMonth.Tammuz,
       'אב': JewishMonth.Av,
       'אלול': JewishMonth.Elul,
-      'תשרי': JewishMonth.Tishrei,
+      'תשרי': JewishMonth.Tishri,
       'חשון': JewishMonth.Cheshvan,
       'כסלו': JewishMonth.Kislev,
       'טבת': JewishMonth.Tevet,
       'שבט': JewishMonth.Shevat,
       'אדר': JewishMonth.Adar,
-      'אדר א׳': JewishMonth.Adar1,
-      'אדר ב׳': JewishMonth.Adar2
+      'אדר א׳': JewishMonth.AdarI,
+      'אדר ב׳': JewishMonth.AdarII
     };
     
-    return monthMap[hebrewName];
+    return monthMap[hebrewName] || JewishMonth.None;
   };
 
   // פונקציה לרינדור בטוח של תאריך לועזי
   const renderGregorianDate = () => {
     try {
-      if (selectedDay && selectedDay.gregorianDate && 
-          typeof selectedDay.gregorianDate.day === 'number' && 
-          typeof selectedDay.gregorianDate.month === 'number' && 
-          typeof selectedDay.gregorianDate.year === 'number') {
-        return `${selectedDay.gregorianDate.day}/${selectedDay.gregorianDate.month}/${selectedDay.gregorianDate.year}`;
+      const anyDay = selectedDay as any;
+      if (anyDay && anyDay.gregorianDate && 
+          typeof anyDay.gregorianDate.day === 'number' && 
+          typeof anyDay.gregorianDate.month === 'number' && 
+          typeof anyDay.gregorianDate.year === 'number') {
+        return `${anyDay.gregorianDate.day}/${anyDay.gregorianDate.month}/${anyDay.gregorianDate.year}`;
       }
       return 'תאריך לא זמין';
     } catch (error) {

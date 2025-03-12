@@ -1,6 +1,6 @@
 import { Person, PersonWithRelations } from '@/models/Person';
 
-export function processData(people: Person[]): PersonWithRelations[] {
+export function processData(people: any[]): PersonWithRelations[] {
   console.log('processData: Starting to process', people ? people.length : 0, 'people');
   
   if (!people || people.length === 0) {
@@ -240,7 +240,7 @@ export function getUpcomingDates(people: PersonWithRelations[]): {
       }
       
       // בדיקת יום נישואין
-      if (person.notifyOnMarriageAnniversary && person.spouse && person.spouseId) {
+      if ((person as any).notifyOnMarriageAnniversary && person.spouse && person.spouseId) {
         if (person.primaryDateFormat === 'hebrew' && person.marriageDateHebrew) {
           // חישוב מספר הימים עד יום הנישואין העברי הבא
           const daysUntil = calculateDaysUntilHebrewDate(person.marriageDateHebrew, currentHebrewDate);
@@ -407,7 +407,7 @@ export function formatHebrewDate(hebrewDateString: string): string {
 
 // פונקציה להמרת מספר לאותיות עבריות
 function numberToHebrewLetters(num: number): string {
-  const letters = {
+  const letters: Record<number, string> = {
     1: 'א', 2: 'ב', 3: 'ג', 4: 'ד', 5: 'ה',
     6: 'ו', 7: 'ז', 8: 'ח', 9: 'ט', 10: 'י',
     20: 'כ', 30: 'ל', 40: 'מ', 50: 'נ', 60: 'ס',
@@ -416,7 +416,7 @@ function numberToHebrewLetters(num: number): string {
   };
   
   // מספרים מיוחדים עם גרשיים
-  const specialNumbers = {
+  const specialNumbers: Record<number, string> = {
     15: 'ט״ו',
     16: 'ט״ז'
   };
@@ -485,7 +485,7 @@ function calculateDaysUntilHebrewDate(hebrewDateString: string, currentHebrewDat
     const targetMonth = parts[1];
     const targetYear = parseInt(parts[2], 10);
     
-    if (isNaN(targetDay) || isNaN(targetMonth) || isNaN(targetYear)) {
+    if (isNaN(targetDay) || isNaN(targetYear)) {
       console.log(`Invalid Hebrew date format: ${hebrewDateString}, returning default value`);
       return 30; // ערך ברירת מחדל
     }
