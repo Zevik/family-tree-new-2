@@ -450,11 +450,15 @@ function numberToHebrewLetters(num: number): string {
     result += letters[ones];
   }
   
-  // הוספת גרשיים בפורמט הנכון
+  // הוספת גרשיים בפורמט הנכון - בין האות האחרונה לפני האחרונה לאות האחרונה
   if (result.length === 1) {
-    result += '״';
+    // אם יש רק אות אחת, נוסיף גרש אחרי האות
+    return result + "'";
   } else if (result.length > 1) {
-    result += '״';
+    // אם יש יותר מאות אחת, נוסיף גרשיים בין האות האחרונה לפני האחרונה לאות האחרונה
+    const lastChar = result.charAt(result.length - 1);
+    const restOfString = result.slice(0, result.length - 1);
+    return restOfString + '"' + lastChar;
   }
   
   return result;
