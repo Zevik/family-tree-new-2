@@ -155,7 +155,15 @@ export default function AddPersonForm({ relatedPersonId, onClose }: AddPersonFor
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/people/add', {
+      // בדיקה אם האפליקציה רצה בסביבת ייצור (נטליפיי) או פיתוח (מקומי)
+      const isProduction = process.env.NODE_ENV === 'production';
+      const apiUrl = isProduction 
+        ? '/.netlify/functions/add-person' 
+        : '/api/people/add';
+      
+      console.log('Submitting to:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hebcal/core": "^5.9.1",
+    "@netlify/functions": "^3.0.1",
     "@types/react-datepicker": "^7.0.0",
     "date-fns": "^3.3.0",
     "hebrew-date": "^1.0.6",
