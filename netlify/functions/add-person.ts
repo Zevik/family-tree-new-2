@@ -4,6 +4,29 @@ import { Person } from '../../src/models/Person';
 import { generateUniqueId } from '../../src/utils/familyUtils';
 import { Handler } from '@netlify/functions';
 
+// פונקציה לפורמט תאריך לועזי
+const formatGregorianDate = (date: string): string => {
+  // אם התאריך כבר בפורמט dd/mm/yyyy, נחזיר אותו כמו שהוא
+  if (date.includes('/')) return date;
+  
+  // אם התאריך בפורמט yyyy-mm-dd, נמיר אותו
+  const [year, month, day] = date.split('-');
+  return `${day}/${month}/${year}`;
+};
+
+// פונקציה לפורמט תאריך עברי
+const formatHebrewDate = (date: string): string => {
+  // אם התאריך כבר מכיל את המילה "ב" לפני החודש, נחזיר אותו כמו שהוא
+  if (date.includes('ב')) return date;
+  
+  // אחרת נוסיף את המילה "ב" לפני שם החודש
+  const parts = date.split(' ');
+  if (parts.length === 3) {
+    return `${parts[0]} ב${parts[1]} ${parts[2]}`;
+  }
+  return date;
+};
+
 const handler: Handler = async (event, context) => {
   // וידוא שזו בקשת POST
   if (event.httpMethod !== 'POST') {
@@ -28,6 +51,15 @@ const handler: Handler = async (event, context) => {
     // קבלת הנתונים מהבקשה
     const data = JSON.parse(event.body || '{}');
     
+    // פורמט תאריכים
+    const formattedData = {
+      ...data,
+      birthDateGregorian: data.birthDateGregorian ? formatGregorianDate(data.birthDateGregorian) : null,
+      birthDateHebrew: data.birthDateHebrew ? formatHebrewDate(data.birthDateHebrew) : null,
+      deathDateGregorian: data.deathDateGregorian ? formatGregorianDate(data.deathDateGregorian) : null,
+      deathDateHebrew: data.deathDateHebrew ? formatHebrewDate(data.deathDateHebrew) : null,
+    };
+    
     // יצירת מזהה ייחודי
     let newId = generateUniqueId();
     let idExists = await PersonModel.findOne({ id: newId }).lean();
@@ -41,33 +73,33 @@ const handler: Handler = async (event, context) => {
     // יצירת האדם החדש
     const newPerson: Person = {
       id: newId,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      birthDateGregorian: data.birthDateGregorian,
-      birthDateHebrew: data.birthDateHebrew,
-      deathDateGregorian: data.deathDateGregorian,
-      deathDateHebrew: data.deathDateHebrew,
-      fatherId: data.fatherId,
-      motherId: data.motherId,
-      spouseId: data.spouseId,
-      marriageDate: data.marriageDate,
-      marriageDateHebrew: data.marriageDateHebrew,
-      email: data.email,
-      phone: data.phone,
-      primaryDateFormat: data.primaryDateFormat || 'gregorian',
-      notifyOnBirthday: data.notifyOnBirthday || false,
+      firstName: formattedData.firstName,
+      lastName: formattedData.lastName,
+      birthDateGregorian: formattedData.birthDateGregorian,
+      birthDateHebrew: formattedData.birthDateHebrew,
+      deathDateGregorian: formattedData.deathDateGregorian,
+      deathDateHebrew: formattedData.deathDateHebrew,
+      fatherId: formattedData.fatherId,
+      motherId: formattedData.motherId,
+      spouseId: formattedData.spouseId,
+      marriageDate: formattedData.marriageDate,
+      marriageDateHebrew: formattedData.marriageDateHebrew,
+      email: formattedData.email,
+      phone: formattedData.phone,
+      primaryDateFormat: formattedData.primaryDateFormat || 'gregorian',
+      notifyOnBirthday: formattedData.notifyOnBirthday || false,
     };
     
     // שמירת האדם החדש
     const person = await PersonModel.create(newPerson);
     
     // עדכון קשרים בהתאם לסוג הקשר
-    if (data.relationshipType && data.relatedPersonId) {
-      const relatedPerson = await PersonModel.findOne({ id: data.relatedPersonId }).lean();
+    if (formattedData.relationshipType && formattedData.relatedPersonId) {
+      const relatedPerson = await PersonModel.findOne({ id: formattedData.relatedPersonId }).lean();
       
       if (relatedPerson) {
         // קבלת הבחירות של הקשרים הסלקטיביים
-        const selectedRelationships = data.selectedRelationships || {
+        const selectedRelationships = formattedData.selectedRelationships || {
           shareFather: true,
           shareMother: true,
           sharedChildren: {},
@@ -75,15 +107,15 @@ const handler: Handler = async (event, context) => {
           shareOtherParent: true
         };
         
-        switch (data.relationshipType) {
+        switch (formattedData.relationshipType) {
           case 'spouse':
             // עדכון ה-spouseId של האדם הקשור
             await PersonModel.updateOne(
-              { id: data.relatedPersonId },
+              { id: formattedData.relatedPersonId },
               { 
                 spouseId: newId, 
-                marriageDate: data.marriageDate,
-                marriageDateHebrew: data.marriageDateHebrew,
+                marriageDate: formattedData.marriageDate,
+                marriageDateHebrew: formattedData.marriageDateHebrew,
               }
             );
             
@@ -91,9 +123,9 @@ const handler: Handler = async (event, context) => {
             await PersonModel.updateOne(
               { id: newId },
               { 
-                spouseId: data.relatedPersonId, 
-                marriageDate: data.marriageDate,
-                marriageDateHebrew: data.marriageDateHebrew
+                spouseId: formattedData.relatedPersonId, 
+                marriageDate: formattedData.marriageDate,
+                marriageDateHebrew: formattedData.marriageDateHebrew
               }
             );
             
@@ -101,8 +133,8 @@ const handler: Handler = async (event, context) => {
             if (relatedPerson && typeof relatedPerson === 'object' && !('spouseId' in relatedPerson)) {
               const children = await PersonModel.find({ 
                 $or: [
-                  { fatherId: data.relatedPersonId },
-                  { motherId: data.relatedPersonId }
+                  { fatherId: formattedData.relatedPersonId },
+                  { motherId: formattedData.relatedPersonId }
                 ]
               }).lean();
               
@@ -110,13 +142,13 @@ const handler: Handler = async (event, context) => {
                 // בדיקה אם הילד נבחר להיות משותף
                 if (selectedRelationships.sharedChildren[child.id]) {
                   // בדיקה אם האדם הקשור הוא האב או האם
-                  if (child.fatherId === data.relatedPersonId) {
+                  if (child.fatherId === formattedData.relatedPersonId) {
                     // האדם הקשור הוא האב, האדם החדש יהיה האם
                     await PersonModel.updateOne(
                       { id: child.id },
                       { motherId: newId }
                     );
-                  } else if (child.motherId === data.relatedPersonId) {
+                  } else if (child.motherId === formattedData.relatedPersonId) {
                     // האדם הקשור הוא האם, האדם החדש יהיה האב
                     await PersonModel.updateOne(
                       { id: child.id },
@@ -135,11 +167,11 @@ const handler: Handler = async (event, context) => {
             // אם לאדם הקשור יש בן/בת זוג, בדוק אם הוא אבא או אמא לילדים אחרים
             if ('spouseId' in relatedPerson && relatedPerson.spouseId) {
               const childrenWithRelatedAsFather = await PersonModel.findOne({ 
-                fatherId: data.relatedPersonId 
+                fatherId: formattedData.relatedPersonId 
               }).lean();
               
               const childrenWithRelatedAsMother = await PersonModel.findOne({ 
-                motherId: data.relatedPersonId 
+                motherId: formattedData.relatedPersonId 
               }).lean();
               
               if (childrenWithRelatedAsMother) {
@@ -153,7 +185,7 @@ const handler: Handler = async (event, context) => {
               // האדם הקשור הוא האב
               await PersonModel.updateOne(
                 { id: newId },
-                { fatherId: data.relatedPersonId }
+                { fatherId: formattedData.relatedPersonId }
               );
               
               // אם לאב יש בן/בת זוג והמשתמש בחר לשתף את ההורה השני
@@ -167,7 +199,7 @@ const handler: Handler = async (event, context) => {
               // האדם הקשור הוא האם
               await PersonModel.updateOne(
                 { id: newId },
-                { motherId: data.relatedPersonId }
+                { motherId: formattedData.relatedPersonId }
               );
               
               // אם לאם יש בן/בת זוג והמשתמש בחר לשתף את ההורה השני
@@ -200,10 +232,10 @@ const handler: Handler = async (event, context) => {
             break;
             
           case 'parent':
-            if (data.parentType === 'father') {
+            if (formattedData.parentType === 'father') {
               // עדכון ה-fatherId של האדם הקשור
               await PersonModel.updateOne(
-                { id: data.relatedPersonId },
+                { id: formattedData.relatedPersonId },
                 { fatherId: newId }
               );
               
@@ -212,7 +244,7 @@ const handler: Handler = async (event, context) => {
                   'motherId' in relatedPerson && relatedPerson.motherId) {
                 const siblings = await PersonModel.find({ 
                   motherId: relatedPerson.motherId,
-                  id: { $ne: data.relatedPersonId }
+                  id: { $ne: formattedData.relatedPersonId }
                 }).lean();
                 
                 for (const sibling of siblings) {
@@ -225,10 +257,10 @@ const handler: Handler = async (event, context) => {
                   }
                 }
               }
-            } else if (data.parentType === 'mother') {
+            } else if (formattedData.parentType === 'mother') {
               // עדכון ה-motherId של האדם הקשור
               await PersonModel.updateOne(
-                { id: data.relatedPersonId },
+                { id: formattedData.relatedPersonId },
                 { motherId: newId }
               );
               
@@ -237,7 +269,7 @@ const handler: Handler = async (event, context) => {
                   'fatherId' in relatedPerson && relatedPerson.fatherId) {
                 const siblings = await PersonModel.find({ 
                   fatherId: relatedPerson.fatherId,
-                  id: { $ne: data.relatedPersonId }
+                  id: { $ne: formattedData.relatedPersonId }
                 }).lean();
                 
                 for (const sibling of siblings) {
