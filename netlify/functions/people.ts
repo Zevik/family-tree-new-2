@@ -26,7 +26,8 @@ const calculateDaysUntilNextBirthday = (birthDate: string, format: 'hebrew' | 'g
     // יצירת תאריך עברי
     const hdate = new HDate(1, monthNum, today.getFullYear());
     // קבלת התאריך הלועזי הבא של יום ההולדת
-    const nextDate = HebrewCalendar.getBirthdayOrAnniversary(hdate, today.getFullYear());
+    const abs = hdate.abs();
+    const nextDate = HebrewCalendar.getBirthdayOrAnniversary(abs, today.getFullYear());
     birthDateObj = nextDate.greg();
   } else {
     // פיצול התאריך הלועזי dd/mm/yyyy
