@@ -10,8 +10,21 @@ const calculateDaysUntilNextBirthday = (birthDate: string, format: 'hebrew' | 'g
   
   if (format === 'hebrew') {
     // המרת תאריך עברי ללועזי
-    const [day, month, year] = birthDate.split(' ');
-    const hdate = new HDate(day);
+    const [_, month] = birthDate.split(' ');
+    // מיפוי חודשים עבריים למספרים
+    const hebrewMonths: { [key: string]: number } = {
+      'בתשרי': 1, 'בחשון': 2, 'בכסלו': 3, 'בטבת': 4,
+      'בשבט': 5, 'באדר': 6, 'בניסן': 7, 'באייר': 8,
+      'בסיון': 9, 'בתמוז': 10, 'באב': 11, 'באלול': 12
+    };
+    
+    const monthNum = hebrewMonths[month];
+    if (!monthNum) {
+      throw new Error(`Invalid Hebrew month: ${month}`);
+    }
+    
+    // יצירת תאריך עברי
+    const hdate = new HDate(1, monthNum, today.getFullYear());
     // קבלת התאריך הלועזי הבא של יום ההולדת
     const nextDate = HebrewCalendar.getBirthdayOrAnniversary(hdate, today.getFullYear());
     birthDateObj = nextDate.greg();
