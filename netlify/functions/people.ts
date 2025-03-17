@@ -44,8 +44,21 @@ const handler: Handler = async (event, context) => {
         bufferCommands: false,
       });
     }
+
+    // אם זו בקשת DELETE, נמחק את כל האנשים
+    if (event.httpMethod === 'DELETE') {
+      await PersonModel.deleteMany({});
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ success: true, message: 'All people were deleted successfully' })
+      };
+    }
     
-    // קבלת הנתונים
+    // אם זו בקשת GET, נחזיר את כל האנשים כרגיל
     const people = await PersonModel.find({}).lean();
     
     // מיפוי קשרים
@@ -98,14 +111,14 @@ const handler: Handler = async (event, context) => {
       body: JSON.stringify(processedPeople)
     };
   } catch (error) {
-    console.error('Error fetching people:', error);
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify({ error: 'Failed to fetch people', message: (error as Error).message })
+      body: JSON.stringify({ error: 'Operation failed', message: (error as Error).message })
     };
   }
 };
