@@ -5,7 +5,6 @@ import FamilyTree from '@/components/FamilyTree';
 import SearchBar from '@/components/SearchBar';
 import UpcomingDates from '@/components/UpcomingDates';
 import { useFamilyData } from '@/lib/hooks/useFamilyData';
-import { FaPlus } from 'react-icons/fa';
 import AddPersonForm from '@/components/AddPersonForm';
 
 export default function Home() {
@@ -25,11 +24,6 @@ export default function Home() {
     setSelectedPersonId(personId);
   };
 
-  const handleAddPerson = () => {
-    console.log('Add person button clicked');
-    setShowAddForm(true);
-  };
-
   const handleCloseForm = () => {
     console.log('Form closed');
     setShowAddForm(false);
@@ -40,14 +34,6 @@ export default function Home() {
       <header className="w-full bg-primary-500 text-white py-4 px-4 sticky top-0 z-10 shadow-md">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">עץ משפחה</h1>
-          
-          <button 
-            className="btn btn-secondary rounded-full p-2 bg-white text-primary-500"
-            onClick={handleAddPerson}
-            aria-label="הוסף אדם חדש"
-          >
-            <FaPlus />
-          </button>
         </div>
       </header>
       
@@ -69,7 +55,7 @@ export default function Home() {
             <p className="text-lg mb-4">לא נמצאו נתונים</p>
             <button 
               className="btn btn-primary"
-              onClick={handleAddPerson}
+              onClick={() => setShowAddForm(true)}
             >
               הוסף אדם ראשון
             </button>
