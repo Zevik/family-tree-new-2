@@ -38,8 +38,36 @@ export default function Home() {
       </header>
       
       <div className="w-full max-w-7xl px-4 py-6">
-        <div className="mb-6">
+        <div className="container mx-auto p-4 text-right">
+          <h1 className="text-3xl font-bold mb-4">עץ משפחה</h1>
+          
+          <button
+            onClick={async () => {
+              if (window.confirm('האם אתה בטוח שברצונך למחוק את כל האנשים?')) {
+                const response = await fetch('/.netlify/functions/people', {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  }
+                });
+                const result = await response.json();
+                if (result.success) {
+                  window.location.reload();
+                } else {
+                  alert('שגיאה במחיקת האנשים');
+                }
+              }
+            }}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-4"
+          >
+            מחק את כל האנשים
+          </button>
+          
           <SearchBar onPersonSelect={handlePersonSelect} />
+          <UpcomingDates 
+            people={data}
+            onPersonSelect={handlePersonSelect}
+          />
         </div>
 
         {isLoading ? (
@@ -62,12 +90,6 @@ export default function Home() {
           </div>
         ) : (
           <>
-            {/* תאריכים קרובים */}
-            <UpcomingDates 
-              people={data}
-              onPersonSelect={handlePersonSelect}
-            />
-            
             {/* עץ המשפחה */}
             <FamilyTree 
               people={data} 
